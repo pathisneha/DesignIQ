@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, Link, useLocation } from 'react-router-dom';
-import { Layers, UploadCloud, Activity, BookOpen, Info, Zap, Menu, X, ChevronRight, Home as HomeIcon } from 'lucide-react';
+import { Layers, Activity, BookOpen, Info, Zap, Menu, X, Home as HomeIcon, MessageCircle } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 import Home from './pages/Home';
@@ -14,12 +14,12 @@ function Sidebar({ isOpen, toggle }) {
   const location = useLocation();
   
   const links = [
-    { name: 'Home Terminal', path: '/', icon: <HomeIcon className="w-5 h-5" /> },
+    { name: 'Home', path: '/', icon: <HomeIcon className="w-5 h-5" /> },
     { name: 'AI Dashboard', path: '/dashboard', icon: <Activity className="w-5 h-5" /> },
     { name: 'Rule Library', path: '/rules', icon: <BookOpen className="w-5 h-5" /> },
     { name: 'Competition', path: '/competitors', icon: <Zap className="w-5 h-5" /> },
     { name: 'About', path: '/about', icon: <Info className="w-5 h-5" /> },
-    { name: 'Contact Us', path: '/contact', icon: <UploadCloud className="w-5 h-5" /> },
+    { name: 'Contact', path: '/contact', icon: <MessageCircle className="w-5 h-5" /> },
   ];
 
   return (
@@ -30,7 +30,7 @@ function Sidebar({ isOpen, toggle }) {
         opacity: isOpen ? 1 : 0
       }}
       transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-      className="fixed top-0 left-0 w-72 bg-[#0F1225]/95 backdrop-blur-2xl border-r border-white/10 h-screen flex flex-col pt-24 pb-8 shrink-0 shadow-[0_0_50px_rgba(0,0,0,0.5)] z-40"
+      className="fixed top-0 left-0 w-72 bg-[#0F1225]/95 backdrop-blur-2xl border-r border-white/10 h-screen flex flex-col pt-24 pb-8 shrink-0 shadow-[0_0_50px_rgba(0,0,0,0.5)] z-40 print:hidden"
     >
       <div className="flex items-center gap-3 px-8 mb-12">
         <div className="p-2.5 bg-gradient-to-br from-primary to-accent rounded-2xl shadow-[0_0_20px_rgba(99,102,241,0.4)]">
@@ -38,7 +38,7 @@ function Sidebar({ isOpen, toggle }) {
         </div>
         <div>
           <h1 className="text-2xl font-black neon-text leading-tight tracking-tighter uppercase italic">DesignIQ</h1>
-          <span className="text-[10px] text-gray-500 uppercase tracking-[0.3em] font-black">Neural Network</span>
+          <span className="text-[10px] text-gray-500 uppercase tracking-[0.3em] font-black">AI Design Validation</span>
         </div>
       </div>
       
@@ -113,19 +113,19 @@ function App() {
     <Router>
       <div className="min-h-screen relative bg-[#111827] text-gray-100 overflow-x-hidden">
         
-        {/* Persistent Toggle Button */}
+        {/* Toggle Button */}
         <motion.button
           onClick={() => setIsOpen(!isOpen)}
           initial={{ opacity: 0, scale: 0.5 }}
           animate={{ opacity: 1, scale: 1 }}
           whileHover={{ scale: 1.1, rotate: 90 }}
           whileTap={{ scale: 0.9 }}
-          className="fixed top-6 left-6 z-50 p-4 bg-white/5 backdrop-blur-2xl border border-white/10 rounded-2xl shadow-xl hover:bg-primary/20 hover:border-primary/40 transition-all text-white"
+          className="fixed top-6 left-6 z-50 p-4 bg-white/5 backdrop-blur-2xl border border-white/10 rounded-2xl shadow-xl hover:bg-primary/20 hover:border-primary/40 transition-all text-white print:hidden"
         >
           {isOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
         </motion.button>
 
-        {/* Overlay when sidebar is open */}
+        {/* Overlay */}
         <AnimatePresence>
           {isOpen && (
             <motion.div

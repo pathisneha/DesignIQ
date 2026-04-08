@@ -1,25 +1,40 @@
 import React, { useState } from 'react';
-import { BookOpen, AlertTriangle, Layers, Maximize2, ShieldAlert, ChevronDown, Wrench, CircleDashed } from 'lucide-react';
+import { BookOpen, AlertTriangle, Layers, Maximize2, ShieldAlert, ChevronDown, Wrench, CircleDashed, Cpu, Globe, Box } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 function CheckCircle(props) {
   return <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>;
 }
 
+const DOMAIN_TABS = [
+  { id: 'all', label: 'All Domains', icon: <Globe className="w-4 h-4" /> },
+  { id: 'mechanical', label: 'Mechanical', icon: <Wrench className="w-4 h-4" /> },
+  { id: 'aerospace', label: 'Aerospace', icon: <Cpu className="w-4 h-4" /> },
+  { id: '3d', label: '3D / Additive', icon: <Box className="w-4 h-4" /> },
+];
+
 function RuleLibrary() {
   const [expandedId, setExpandedId] = useState(null);
+  const [activeTab, setActiveTab] = useState('all');
 
   const rules = [
-    { id: "R-01", domain: "Mechanical", name: "Wall Thickness Check", shortDesc: "Ensures the part can withstand manufacturing pressures without warping.", detail: "If walls are too thin, they are brittle and may snap under stress. In injection molding, thin walls cause short shots (the liquid plastic freezes before filling the mold). If they are too thick, you'll see internal voids and sink marks due to uneven cooling.", icon: <Layers className="text-primary w-5 h-5" />, color: 'indigo' },
-    { id: "R-02", domain: "Automotive", name: "Hole-to-Edge Distance", shortDesc: "Distance between a hole center and material edge must be safe.", detail: "If a hole is drilled too close to an edge, the remaining thin material strip cannot hold the stress of a fastener. Minimum rule: Distance > 1.5x hole diameter.", icon: <Maximize2 className="text-accent w-5 h-5" />, color: 'amber' },
-    { id: "R-03", domain: "Manufacturing (CNC)", name: "Sharp Internal Corner Detection", shortDesc: "Detects internal sharp corners that cylindrical milling tools cannot cut.", detail: "CNC drills and endmills are spinning cylinders. It is physically impossible to cut a sharp 90-degree internal angle. Always use a fillet radius larger than the tool radius.", icon: <AlertTriangle className="text-accent w-5 h-5" />, color: 'amber' },
-    { id: "R-04", domain: "Manufacturing (3D Print)", name: "Overhang Angle Detection", shortDesc: "Identifies unsupported angles greater than 45°.", detail: "3D printers (FDM/SLA) print layer by layer. If an overhang angle exceeds 45 degrees, the printer attempts to print in mid-air, causing sag or collapse.", icon: <ShieldAlert className="text-danger w-5 h-5" />, color: 'red' },
-    { id: "R-05", domain: "Mechanical", name: "Draft Angle Verification", shortDesc: "Ensures vertical walls have a taper for mold ejection.", detail: "In casting and injection molding, parts shrink as they cool and clamp onto the mold core. Without a 1°–3° draft angle, the part will drag across the mold during ejection.", icon: <CheckCircle className="text-primary w-5 h-5" />, color: 'indigo' },
-    { id: "R-06", domain: "Automotive", name: "Stress Concentration Check", shortDesc: "Highlights areas where structural loads magnify dangerously.", detail: "Sudden changes in cross-section (like an L-bracket without a fillet) create infinite theoretical stress. DesignIQ suggests adding a smooth transition radius.", icon: <Layers className="text-accent w-5 h-5" />, color: 'amber' },
-    { id: "R-07", domain: "Manufacturing", name: "Small Feature Tolerance", shortDesc: "Detects features too small for the selected manufacturing method.", detail: "For instance, requesting a 0.1mm hole on standard CNC. Standard drill bits break at that size. DesignIQ identifies out-of-spec micro features before they cause stoppage.", icon: <Maximize2 className="text-accent w-5 h-5" />, color: 'amber' },
-    { id: "R-08", domain: "Mechanical", name: "Blind Hole Depth Ratio", shortDesc: "Calculates the depth-to-diameter ratio of holes.", detail: "If a hole is too deep compared to its width (e.g., > 6:1), the drill bit struggles to evacuate chips, causing it to overheat and shatter.", icon: <CircleDashed className="text-danger w-5 h-5" />, color: 'red' },
-    { id: "R-09", domain: "Automotive", name: "Symmetry & Balance Check", shortDesc: "Ensures rotating parts are mass-balanced to prevent vibration.", detail: "For parts mounted on axles or drivetrains, uneven mass distribution causes catastrophic vibration at high RPM. DesignIQ calculates the center of mass variance.", icon: <Wrench className="text-primary w-5 h-5" />, color: 'indigo' },
-    { id: "R-10", domain: "Manufacturing (Injection)", name: "Uniform Wall Thickness", shortDesc: "Prevents warping by enforcing consistent thickness.", detail: "A part with changing thicknesses will cool at different rates. The thicker areas stay hot longer and shrink inward, causing warping. DesignIQ flags areas with > 10% thickness deviance.", icon: <Layers className="text-accent w-5 h-5" />, color: 'amber' },
+    // Mechanical Rules
+    { id: "M-01", domain: "mechanical", domainLabel: "Mechanical Engineering", name: "Wall Thickness Check", shortDesc: "Ensures walls can withstand manufacturing pressures without warping or breaking.", detail: "Thin walls are brittle and may snap under stress. In injection molding, thin walls cause short shots — the liquid plastic freezes before filling the mold cavity. Thick walls create internal voids and sink marks from uneven cooling. DesignIQ checks for minimum 0.8mm (CNC), 1.5mm (casting), and uniform ±15% variance.", icon: <Layers className="text-primary w-5 h-5" />, color: 'indigo' },
+    { id: "M-02", domain: "mechanical", domainLabel: "Mechanical Engineering", name: "Fillet Radius Optimization", shortDesc: "Detects sharp internal corners that cutting tools cannot machine.", detail: "CNC endmills are cylindrical — they physically cannot cut sharp 90° internal corners. Sharp corners also create stress concentration factors of 3-5x, causing fatigue failure. DesignIQ recommends radii ≥ tool radius (R1.5mm minimum for standard tooling).", icon: <CheckCircle className="text-primary w-5 h-5" />, color: 'indigo' },
+    { id: "M-03", domain: "mechanical", domainLabel: "Mechanical Engineering", name: "Hole Depth Ratio", shortDesc: "Validates blind hole depth-to-diameter ratio to prevent tool breakage.", detail: "Deep narrow holes prevent proper chip evacuation — chips pack against the drill, causing overheating, breaking, or hole drift. Steel: max 4:1 ratio. Aluminum: max 6:1. Nylon: max 3:1 (due to flexibility). DesignIQ flags all violations and suggests pilot drilling strategies.", icon: <CircleDashed className="text-primary w-5 h-5" />, color: 'indigo' },
+    { id: "M-04", domain: "mechanical", domainLabel: "Mechanical Engineering", name: "Draft Angle Verification", shortDesc: "Ensures vertical walls have taper for mold ejection or tool clearance.", detail: "In casting and injection molding, parts shrink and grip the mold core. Without 1-3° draft, the part tears on ejection. In CNC, zero-draft pockets cause the tool to rub on retract strokes, damaging surface finish. DesignIQ validates all surfaces and suggests appropriate angles per process.", icon: <Maximize2 className="text-primary w-5 h-5" />, color: 'indigo' },
+
+    // Aerospace Rules
+    { id: "A-01", domain: "aerospace", domainLabel: "Aerospace Engineering", name: "Weight Optimization", shortDesc: "Identifies excess material in non-structural regions for mass reduction.", detail: "In aerospace, every gram impacts fuel efficiency and performance. DesignIQ uses topology-guided analysis to identify regions where material can be removed without compromising structural integrity. Typical savings: 15-35% mass reduction while maintaining FOS > 2.0.", icon: <ShieldAlert className="text-accent w-5 h-5" />, color: 'amber' },
+    { id: "A-02", domain: "aerospace", domainLabel: "Aerospace Engineering", name: "Stress Tolerance Analysis", shortDesc: "Identifies stress concentrations that exceed material yield strength.", detail: "Von Mises stress analysis identifies hotspots where loading exceeds material capability. For titanium Ti-6Al-4V: yield = 880 MPa. For Al 7075-T6: yield = 503 MPa. DesignIQ flags concentrations and suggests fillet transitions, reinforcement bosses, and load redistribution geometry.", icon: <AlertTriangle className="text-accent w-5 h-5" />, color: 'amber' },
+    { id: "A-03", domain: "aerospace", domainLabel: "Aerospace Engineering", name: "Fatigue Resistance Check", shortDesc: "Evaluates design lifetime under cyclic loading conditions.", detail: "Aerospace components undergo millions of load cycles. Sharp notches and abrupt section changes create fatigue crack initiation sites. DesignIQ evaluates notch sensitivity factors, recommends shot-peening specs, and validates against DO-160 and FAR 25.571 damage tolerance requirements.", icon: <Layers className="text-accent w-5 h-5" />, color: 'amber' },
+    { id: "A-04", domain: "aerospace", domainLabel: "Aerospace Engineering", name: "Safety Factor Verification", shortDesc: "Validates structural margins against aerospace certification standards.", detail: "Aerospace requires FOS ≥ 1.5 for metallic primary structure (FAR 25.303). DesignIQ validates limit load (1.5x) and ultimate load (1.0x) margins, checks for fail-safe redundancy, and flags any cross-section below minimum required by aircraft certification standards.", icon: <ShieldAlert className="text-accent w-5 h-5" />, color: 'amber' },
+
+    // 3D / Additive Rules
+    { id: "3D-01", domain: "3d", domainLabel: "3D Design / Additive", name: "Overhang Angle Detection", shortDesc: "Identifies unsupported geometry exceeding printable angles.", detail: "FDM/SLA printers build layer by layer. Overhangs beyond 45° (FDM) or 30° (SLA) attempt to print in mid-air, causing sag, collapse, or failed prints. SLS is support-free but enclosed volumes need drain holes. DesignIQ analyzes all surfaces and suggests redesign or support strategies.", icon: <ShieldAlert className="text-danger w-5 h-5" />, color: 'red' },
+    { id: "3D-02", domain: "3d", domainLabel: "3D Design / Additive", name: "Support Structure Analysis", shortDesc: "Evaluates support requirements and post-processing difficulty.", detail: "Supports are necessary evil in 3D printing. They leave surface marks, waste material, and can damage thin features during removal. DesignIQ minimizes support volume by suggesting optimal orientation, self-supporting angles, and tree-support strategies for complex geometry.", icon: <Wrench className="text-danger w-5 h-5" />, color: 'red' },
+    { id: "3D-03", domain: "3d", domainLabel: "3D Design / Additive", name: "Print Orientation Optimization", shortDesc: "Determines best build orientation for strength and quality.", detail: "FDM/SLA parts have anisotropic properties — Z-direction strength is only 40-60% of X-Y. DesignIQ aligns primary load paths with the strongest print direction, minimizes support contact on visible surfaces, and reduces warpage risk for large flat parts.", icon: <Layers className="text-danger w-5 h-5" />, color: 'red' },
+    { id: "3D-04", domain: "3d", domainLabel: "3D Design / Additive", name: "Layer Thickness Optimization", shortDesc: "Recommends optimal layer height for strength and surface quality.", detail: "Thinner layers (25-50µm) give better surface finish and detail but increase print time 4-8x. Thicker layers (200-300µm) are faster but rough. DesignIQ suggests adaptive layer heights — fine layers for detailed regions, coarse for structural bulk — balancing quality and speed.", icon: <Maximize2 className="text-danger w-5 h-5" />, color: 'red' },
   ];
 
   const colorMap = {
@@ -28,10 +43,12 @@ function RuleLibrary() {
     red: { bg: 'bg-danger/10', border: 'border-danger/20', icon: 'bg-red-900/40 text-danger' },
   };
 
+  const filteredRules = activeTab === 'all' ? rules : rules.filter(r => r.domain === activeTab);
+
   const handleToggle = (id) => setExpandedId(expandedId === id ? null : id);
 
   return (
-    <div className="p-8 max-w-5xl mx-auto w-full">
+    <div className="p-8 max-w-5xl mx-auto w-full font-outfit">
       <motion.div
         initial={{ opacity: 0, y: -10 }}
         animate={{ opacity: 1, y: 0 }}
@@ -42,12 +59,36 @@ function RuleLibrary() {
         </div>
         <div>
           <h2 className="text-3xl font-bold text-white">Engineering Rule Library</h2>
-          <p className="text-gray-400">Deep-dive into the complex DFM parameters the DesignIQ engine evaluates.</p>
+          <p className="text-gray-400">Explore the DFM validation rules powering DesignIQ's AI analysis engine.</p>
         </div>
       </motion.div>
+
+      {/* Domain Filter Tabs */}
+      <div className="flex flex-wrap gap-3 mb-8">
+        {DOMAIN_TABS.map((tab) => (
+          <motion.button
+            key={tab.id}
+            whileHover={{ scale: 1.03 }}
+            whileTap={{ scale: 0.97 }}
+            onClick={() => setActiveTab(tab.id)}
+            className={`flex items-center gap-3 px-6 py-3 rounded-full text-[10px] font-black uppercase tracking-widest transition-all border ${
+              activeTab === tab.id
+                ? 'bg-primary/20 border-primary/40 text-white shadow-[0_0_20px_rgba(99,102,241,0.2)]'
+                : 'bg-white/5 border-white/10 text-gray-500 hover:text-white hover:border-white/20'
+            }`}
+          >
+            {tab.icon}
+            {tab.label}
+          </motion.button>
+        ))}
+      </div>
+
+      <div className="text-[10px] font-black text-gray-600 uppercase tracking-widest mb-4">
+        Showing {filteredRules.length} rules {activeTab !== 'all' ? `in ${DOMAIN_TABS.find(t => t.id === activeTab)?.label}` : ''}
+      </div>
       
       <div className="space-y-3">
-        {rules.map((rule, idx) => {
+        {filteredRules.map((rule, idx) => {
           const isExpanded = expandedId === rule.id;
           const c = colorMap[rule.color];
           return (
@@ -67,8 +108,8 @@ function RuleLibrary() {
                 <div className="flex-1">
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-1 gap-2">
                     <h3 className="text-lg font-bold text-white">{rule.name}</h3>
-                    <span className="text-xs font-bold px-3 py-1 bg-gray-100 rounded-full text-gray-400 w-fit border border-white/10">
-                      {rule.domain} • {rule.id}
+                    <span className="text-xs font-bold px-3 py-1 bg-white/5 rounded-full text-gray-400 w-fit border border-white/10">
+                      {rule.domainLabel} • {rule.id}
                     </span>
                   </div>
                   <p className="text-gray-400 text-sm">{rule.shortDesc}</p>
@@ -95,7 +136,7 @@ function RuleLibrary() {
                     <div className={`p-5 pt-0 border-t ${c.border}`}>
                       <div className={`${c.bg} rounded-xl p-4 mt-4 border ${c.border}`}>
                         <h4 className="font-bold text-primary mb-2 flex items-center gap-2 text-sm">
-                          <AlertTriangle className="w-4 h-4" /> Why does this rule matter?
+                          <AlertTriangle className="w-4 h-4" /> Engineering Detail
                         </h4>
                         <p className="text-gray-200 text-sm leading-relaxed">{rule.detail}</p>
                       </div>
